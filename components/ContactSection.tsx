@@ -19,7 +19,7 @@ export default function ContactSection() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
 
-  const contactEmail = 'yuktimedia.in@gmail.com';
+  const contactEmail = 'mediayukti@gmail.com';
   const whatsappNumber = '+91 81098 69400';
   const whatsappUrl =
     'https://api.whatsapp.com/send/?phone=918109869400&text=Hyyy%20👋%20I%20would%20like%20to%20discuss%20a%20project%20with%20Yukti%20Media!';
@@ -107,7 +107,7 @@ export default function ContactSection() {
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="your.email@example.com"
+                  placeholder="mediayukti@gmail.com"
                   className="w-full px-4 py-3.5 rounded-xl bg-[#14120b] border border-[#302917] hover:border-[#6a5a2f]/70 text-white placeholder-[#71717a] text-sm focus:outline-none focus:border-[#fac638] focus:ring-1 focus:ring-[#fac638]/40 transition-all"
                 />
               </div>
@@ -203,15 +203,7 @@ export default function ContactSection() {
           <div className="pt-2">
             <p className="text-xs text-[#a1a1aa] mb-3">Connect with me</p>
             <div className="flex items-center gap-2.5">
-              <a
-                href="https://github.com"
-                target="_blank"
-                rel="noreferrer"
-                className="size-10 rounded-xl bg-[#14120b] border border-[#302917] hover:border-[#fac638] flex items-center justify-center text-white/80 hover:text-[#fac638] transition-all hover:scale-105"
-                aria-label="GitHub"
-              >
-                <Github className="w-4 h-4" />
-              </a>
+
               <a
                 href="https://linkedin.com"
                 target="_blank"
@@ -222,7 +214,7 @@ export default function ContactSection() {
                 <Linkedin className="w-4 h-4" />
               </a>
               <a
-                href="https://instagram.com"
+                href="https://instagram.com/yuktii.media.in/"
                 target="_blank"
                 rel="noreferrer"
                 className="size-10 rounded-xl bg-[#14120b] border border-[#302917] hover:border-[#fac638] flex items-center justify-center text-white/80 hover:text-[#fac638] transition-all hover:scale-105"

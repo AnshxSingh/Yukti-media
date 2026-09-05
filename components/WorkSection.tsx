@@ -2,6 +2,9 @@
 
 import React, { useState, useRef } from 'react';
 import { Volume2, VolumeX, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { Pagination } from 'swiper/modules';
+import type { Swiper as SwiperType } from 'swiper';
 
 const SAMPLES = [
   {
@@ -30,8 +33,8 @@ export default function WorkSection() {
     1: true,
     2: true,
   });
-  const [activeIndex, setActiveIndex] = useState(0);
   const videoRefs = useRef<{ [key: number]: HTMLVideoElement | null }>({});
+  const swiperRef = useRef<SwiperType | null>(null);
 
   const toggleMute = (idx: number) => {
     const video = videoRefs.current[idx];
@@ -42,12 +45,49 @@ export default function WorkSection() {
     }
   };
 
-  const nextSlide = () => {
-    setActiveIndex((prev) => (prev + 1) % SAMPLES.length);
+  const handlePrev = () => {
+    if (swiperRef.current) {
+      swiperRef.current.slidePrev();
+    }
   };
 
-  const prevSlide = () => {
-    setActiveIndex((prev) => (prev - 1 + SAMPLES.length) % SAMPLES.length);
+  const handleNext = () => {
+    if (swiperRef.current) {
+      swiperRef.current.slideNext();
+    }
+  };
+
+  const renderCard = (sample: typeof SAMPLES[0], idx: number) => {
+    const isMuted = mutedStates[idx] ?? true;
+    return (
+      <div className="flex flex-col gap-3 rounded-2xl border border-[#6a5a2f]/40 bg-[#2a2414] p-3.5 hover:border-[#fac638] transition-all group h-full">
+        <div className="relative pt-[177.77%] rounded-xl overflow-hidden bg-black/60">
+          <video
+            ref={(el) => { videoRefs.current[idx] = el; }}
+            src={sample.src}
+            autoPlay
+            loop
+            muted
+            playsInline
+            className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+          />
+
+          {/* Volume Toggle */}
+          <button
+            onClick={() => toggleMute(idx)}
+            className="absolute top-3 right-3 z-30 size-8 rounded-full bg-black/70 border border-white/20 flex items-center justify-center text-white hover:bg-black hover:scale-110 active:scale-95 transition-all"
+            aria-label={isMuted ? 'Unmute video' : 'Mute video'}
+          >
+            {isMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4 text-[#fac638]" />}
+          </button>
+        </div>
+
+        <div className="text-center pt-1">
+          <h3 className="text-white text-base font-bold">{sample.title}</h3>
+          <p className="text-[#ccbc8e] text-xs font-normal mt-0.5">{sample.subtitle}</p>
+        </div>
+      </div>
+    );
   };
 
   return (
@@ -59,14 +99,14 @@ export default function WorkSection() {
         {/* Navigation buttons */}
         <div className="flex items-center gap-2">
           <button
-            onClick={prevSlide}
+            onClick={handlePrev}
             className="size-9 rounded-full bg-[#352d18] border border-[#6a5a2f] text-[#fac638] flex items-center justify-center hover:scale-110 active:scale-95 transition-all"
             aria-label="Previous slide"
           >
             <ChevronLeft className="w-4 h-4" />
           </button>
           <button
-            onClick={nextSlide}
+            onClick={handleNext}
             className="size-9 rounded-full bg-[#352d18] border border-[#6a5a2f] text-[#fac638] flex items-center justify-center hover:scale-110 active:scale-95 transition-all"
             aria-label="Next slide"
           >
@@ -78,44 +118,43 @@ export default function WorkSection() {
         A glimpse of high-retention video edits and viral reels crafted for our clients.
       </p>
 
-      {/* Video Grid / Slider */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-        {SAMPLES.map((sample, idx) => {
-          const isMuted = mutedStates[idx] ?? true;
-          return (
-            <div
-              key={sample.id}
-              className="flex flex-col gap-3 rounded-2xl border border-[#6a5a2f]/40 bg-[#2a2414] p-3.5 hover:border-[#fac638] transition-all group"
-            >
-              <div className="relative pt-[177.77%] rounded-xl overflow-hidden bg-black/60">
-                <video
-                  ref={(el) => { videoRefs.current[idx] = el; }}
-                  src={sample.src}
-                  autoPlay
-                  loop
-                  muted
-                  playsInline
-                  className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                />
+      {/* Mobile: Swiper Carousel */}
+      <div className="block md:hidden">
+        <Swiper
+          onBeforeInit={(swiper) => { swiperRef.current = swiper; }}
+          modules={[Pagination]}
+          pagination={{ clickable: true }}
+          spaceBetween={16}
+          slidesPerView={1.15}
+          breakpoints={{
+            480: {
+              slidesPerView: 1.4,
+              spaceBetween: 18,
+            },
+            600: {
+              slidesPerView: 1.8,
+              spaceBetween: 20,
+            }
+          }}
+          className="pb-8"
+        >
+          {SAMPLES.map((sample, idx) => (
+            <SwiperSlide key={sample.id}>
+              {renderCard(sample, idx)}
+            </SwiperSlide>
+          ))}
+        </Swiper>
+      </div>
 
-                {/* Volume Toggle */}
-                <button
-                  onClick={() => toggleMute(idx)}
-                  className="absolute top-3 right-3 z-30 size-8 rounded-full bg-black/70 border border-white/20 flex items-center justify-center text-white hover:bg-black hover:scale-110 active:scale-95 transition-all"
-                  aria-label={isMuted ? 'Unmute video' : 'Mute video'}
-                >
-                  {isMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4 text-[#fac638]" />}
-                </button>
-              </div>
-
-              <div className="text-center pt-1">
-                <h3 className="text-white text-base font-bold">{sample.title}</h3>
-                <p className="text-[#ccbc8e] text-xs font-normal mt-0.5">{sample.subtitle}</p>
-              </div>
-            </div>
-          );
-        })}
+      {/* Desktop: 3-Column Grid */}
+      <div className="hidden md:grid grid-cols-3 gap-5">
+        {SAMPLES.map((sample, idx) => (
+          <div key={sample.id}>
+            {renderCard(sample, idx)}
+          </div>
+        ))}
       </div>
     </section>
   );
 }
+

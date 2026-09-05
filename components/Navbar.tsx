@@ -7,11 +7,11 @@ export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
-    <header className="sticky top-0 z-50 flex items-center justify-between border-b border-[#6a5a2f]/40 px-5 sm:px-10 py-3 bg-[#231e10]/90 backdrop-blur-md">
+    <header className="sticky top-0 z-50 h-16 flex items-center justify-between border-b border-[#6a5a2f]/40 px-5 sm:px-10 py-3 bg-[#231e10]/90 backdrop-blur-md">
       {/* Brand */}
       <a href="#" className="flex items-center gap-3 no-underline group">
-        <div className="size-8 rounded-lg overflow-hidden flex items-center justify-center bg-[#fac638]/10 border border-[#fac638]/30 group-hover:scale-105 transition-transform">
-          <img src="/favicon/favicon.png" alt="Yukti Media Logo" className="w-full h-full object-contain" />
+        <div className="size-8 rounded-lg overflow-hidden flex items-center justify-center">
+          <img src="/assets/images/logo.png" alt="Yukti Media Logo" className="w-full h-full object-contain" />
         </div>
         <h2 className="text-white text-lg font-bold tracking-tight">Yukti Media</h2>
       </a>
