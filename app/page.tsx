@@ -1,52 +1,74 @@
-'use client';
-
-import React from 'react';
+import React, { Suspense } from 'react';
+import dynamic from 'next/dynamic';
 import Navbar from '@/components/Navbar';
-import HeroSection from '@/components/HeroSection';
-import DashboardMetrics from '@/components/DashboardMetrics';
-import ServicesSection from '@/components/ServicesSection';
-import WorkSection from '@/components/WorkSection';
-import WebsitesSection from '@/components/WebsitesSection';
-import ReviewsSection from '@/components/ReviewsSection';
-import AboutSection from '@/components/AboutSection';
-import ContactSection from '@/components/ContactSection';
-import Footer from '@/components/Footer';
+import TrainHeroSection from '@/components/TrainHeroSection';
+
+// Below-the-fold sections are code-split and loaded on demand to
+// reduce the initial JavaScript payload and improve first paint.
+const DashboardMetrics = dynamic(() => import('@/components/DashboardMetrics'));
+const ServicesSection = dynamic(() => import('@/components/ServicesSection'));
+const WorkSection = dynamic(() => import('@/components/WorkSection'));
+const WebsitesSection = dynamic(() => import('@/components/WebsitesSection'));
+const ReviewsSection = dynamic(() => import('@/components/ReviewsSection'));
+const AboutSection = dynamic(() => import('@/components/AboutSection'));
+const ContactSection = dynamic(() => import('@/components/ContactSection'));
+const Footer = dynamic(() => import('@/components/Footer'));
+
+function SectionLoader() {
+  return <div className="w-full h-24 bg-transparent" aria-hidden="true" />;
+}
 
 export default function HomePage() {
   return (
-    <div className="min-h-screen bg-[#231e10] text-white flex flex-col font-inter selection:bg-[#fac638] selection:text-[#231e10]">
+    <div className="min-h-screen bg-cream text-espresso flex flex-col font-inter selection:bg-purple-500 selection:text-white transition-colors duration-300">
       {/* Navigation */}
       <Navbar />
 
-      {/* Hero Section with Integrated 3D Logo & Scroll-Driven Circle Inversion Animation */}
-      <HeroSection />
+      {/* Train-Themed Roller Coaster Opening Hero Section */}
+      <TrainHeroSection />
 
       {/* Dashboard Analytics */}
-      <DashboardMetrics />
+      <Suspense fallback={<SectionLoader />}>
+        <DashboardMetrics />
+      </Suspense>
 
       {/* Main Content Layout */}
       <main className="w-full flex-1 flex flex-col items-center">
         {/* Services */}
-        <ServicesSection />
+        <Suspense fallback={<SectionLoader />}>
+          <ServicesSection />
+        </Suspense>
 
         {/* Work / Video Reels */}
-        <WorkSection />
+        <Suspense fallback={<SectionLoader />}>
+          <WorkSection />
+        </Suspense>
 
         {/* 3D Websites Showcase */}
-        <WebsitesSection />
+        <Suspense fallback={<SectionLoader />}>
+          <WebsitesSection />
+        </Suspense>
 
         {/* Client Reviews */}
-        <ReviewsSection />
+        <Suspense fallback={<SectionLoader />}>
+          <ReviewsSection />
+        </Suspense>
 
         {/* About Us */}
-        <AboutSection />
+        <Suspense fallback={<SectionLoader />}>
+          <AboutSection />
+        </Suspense>
 
         {/* Contact */}
-        <ContactSection />
+        <Suspense fallback={<SectionLoader />}>
+          <ContactSection />
+        </Suspense>
       </main>
 
       {/* Footer */}
-      <Footer />
+      <Suspense fallback={null}>
+        <Footer />
+      </Suspense>
     </div>
   );
 }

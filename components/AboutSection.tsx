@@ -3,14 +3,15 @@
 import React, { useState } from 'react';
 import {
   Code2,
-  Sparkles,
+  BookOpen,
+  Layers,
+  CheckCircle2,
   Zap,
-  ArrowRight,
-  Layers
+  ArrowRight
 } from 'lucide-react';
 
 const TABS = [
-  { id: 'story', label: 'My Story', icon: Sparkles },
+  { id: 'story', label: 'My Story', icon: BookOpen },
   { id: 'engineering', label: 'Engineering Core', icon: Code2 },
   { id: 'client', label: 'Client Experience', icon: Layers },
 ];
@@ -34,13 +35,13 @@ const TAB_CONTENT = {
     badge: 'High-Retention Delivery & Growth',
     heading: 'Client-centric collaboration from concept to deployment.',
     p1: 'Transparent communication, milestone-driven sprints, and direct scoping via WhatsApp and Email to keep you fully informed at every stage.',
-    p2: 'We do not just write code or edit footage — we build high-converting digital assets designed to transform attention into real brand equity.',
+    p2: 'We do not just write code or edit footage -- we build high-converting digital assets designed to transform attention into real brand equity.',
     p3: 'With rapid turnaround times and dedicated post-launch support, your satisfaction and business metrics always come first.',
   },
 };
 
 const STATS = [
-  { value: '50+', label: 'Sites Shipped' },
+  { value: '10+', label: 'Sites Shipped' },
   { value: '99+', label: 'Lighthouse Score' },
   { value: '100%', label: 'On-Time Delivery' },
   { value: '< 24h', label: 'Response Time' },
@@ -52,10 +53,20 @@ export default function AboutSection() {
   const current = TAB_CONTENT[activeTab];
 
   return (
-    <section id="about" className="w-full max-w-[1180px] mx-auto px-4 sm:px-6 py-20 scroll-mt-16">
+    <section id="about" className="w-full max-w-[1180px] mx-auto px-4 sm:px-6 py-24 scroll-mt-20 text-espresso transition-colors duration-300">
+      {/* Section Header */}
+      <div className="text-center max-w-xl mx-auto mb-10">
+        <h2 className="text-espresso text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight">
+          About <span className="inline-block bg-gradient-to-r from-purple via-fuchsia-500 to-indigo-500 bg-clip-text text-transparent">Us</span>
+        </h2>
+        <p className="text-mocha text-sm sm:text-base mt-3 leading-relaxed">
+          The team, technology, and philosophy driving extraordinary digital results.
+        </p>
+      </div>
+
       {/* Interactive Tabs Header */}
-      <div className="flex items-center justify-start sm:justify-center mb-10 overflow-x-auto pb-2">
-        <div className="inline-flex items-center gap-1.5 p-1.5 rounded-2xl bg-[#14120b] border border-[#302917] backdrop-blur-md">
+      <div className="flex items-center justify-start sm:justify-center mb-12 overflow-x-auto pb-2">
+        <div className="inline-flex items-center gap-1.5 p-1.5 rounded-2xl bg-creamcard border border-purpleborder backdrop-blur-xl shadow-sm">
           {TABS.map((tab) => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.id;
@@ -64,10 +75,11 @@ export default function AboutSection() {
                 key={tab.id}
                 type="button"
                 onClick={() => setActiveTab(tab.id as 'story' | 'engineering' | 'client')}
-                className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-all duration-200 whitespace-nowrap ${
+                style={isActive ? { background: 'linear-gradient(135deg, #6b21a8 0%, #4c1d95 100%)', color: '#ffffff' } : undefined}
+                className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-all duration-200 whitespace-nowrap cursor-pointer ${
                   isActive
-                    ? 'bg-[#fac638] text-[#231e10] font-bold shadow-lg shadow-[#fac638]/20 scale-[1.02]'
-                    : 'text-[#a1a1aa] hover:text-white hover:bg-[#201c12]'
+                    ? 'btn-brand-gradient text-white shadow-md shadow-purple-900/30 scale-[1.02]'
+                    : 'text-mocha hover:text-espresso hover:bg-creamsoft'
                 }`}
               >
                 <Icon className="w-4 h-4" />
@@ -83,97 +95,97 @@ export default function AboutSection() {
         {/* Left Column: Heading, Story Content, Stats, and Action Buttons */}
         <div className="lg:col-span-7 flex flex-col gap-6">
           {/* Badge */}
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#1c180d] border border-[#fac638]/30 text-[#fac638] text-xs font-medium w-fit">
-            <Code2 className="w-3.5 h-3.5 text-[#fac638]" />
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-purple/10 border border-purpleborder text-purpledeep dark:text-purplelight text-xs font-semibold w-fit shadow-inner">
+            <Code2 className="w-3.5 h-3.5 text-purple" />
             <span>{current.badge}</span>
-            <Sparkles className="w-3 h-3 text-[#fac638]" />
           </div>
 
           {/* Big Bold Headline */}
-          <h2 className="text-white text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight leading-[1.15]">
+          <h2 className="text-espresso text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight leading-[1.15]">
             {current.heading}
           </h2>
 
           {/* Narrative Paragraphs */}
-          <div className="flex flex-col gap-3.5 text-[#a1a1aa] text-sm sm:text-base leading-relaxed">
+          <div className="flex flex-col gap-3.5 text-mocha text-sm sm:text-base leading-relaxed">
             <p>{current.p1}</p>
             <p>{current.p2}</p>
-            <p className="text-[#71717a] text-xs sm:text-sm">{current.p3}</p>
+            <p>{current.p3}</p>
           </div>
 
-          {/* Stats Badges Row (Unified Gold/Amber Theme) */}
+          {/* Key Metric Numbers */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2">
             {STATS.map((stat, idx) => (
               <div
                 key={idx}
-                className="p-3.5 rounded-2xl bg-[#14120b] border border-[#302917] hover:border-[#fac638]/60 flex flex-col items-center justify-center text-center transition-colors"
+                className="p-4 rounded-2xl bg-creamcard border border-purpleborder hover:border-purple/70 flex flex-col items-center justify-center text-center transition-all duration-300 shadow-sm hover:shadow-lg dark:hover:shadow-purple-950/20 group"
               >
-                <span className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[#fac638]">
+                <span className="inline-block text-2xl sm:text-3xl font-black tracking-tight text-purple-600 dark:text-purple-400 group-hover:scale-105 transition-transform">
                   {stat.value}
                 </span>
-                <span className="text-[11px] text-[#a1a1aa] font-medium mt-1">
+                <span className="text-[11px] text-mocha font-medium mt-1">
                   {stat.label}
                 </span>
               </div>
             ))}
           </div>
 
-          {/* Action CTA Buttons (Unified Gold Brand Color) */}
+          {/* Action CTA Buttons */}
           <div className="flex flex-wrap items-center gap-4 pt-2">
             <a
               href="#contact"
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-[#fac638] hover:bg-[#fcd34d] text-[#231e10] font-bold text-xs sm:text-sm hover:scale-105 active:scale-95 transition-all shadow-lg shadow-[#fac638]/20 no-underline"
+              style={{ background: 'linear-gradient(135deg, #6b21a8 0%, #4c1d95 100%)', color: '#ffffff' }}
+              className="btn-brand-gradient inline-flex items-center gap-2 px-6 py-3 rounded-full text-white font-bold text-xs sm:text-sm hover:scale-105 active:scale-95 transition-all shadow-lg shadow-purple-900/30 no-underline hover:brightness-110"
             >
               <span>Book Discovery Call</span>
               <ArrowRight className="w-4 h-4" />
             </a>
 
             <a
-              href="#work"
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-[#14120b] border border-[#302917] hover:border-[#fac638] text-white/90 hover:text-white font-semibold text-xs sm:text-sm hover:scale-105 active:scale-95 transition-all no-underline"
+              href="#contact"
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-full border border-purpleborder bg-creamcard hover:border-purple hover:bg-creamsoft text-espresso hover:text-purple font-semibold text-xs sm:text-sm transition-all no-underline"
             >
-              <span>View Case Studies</span>
+              <span>Contact Us</span>
             </a>
           </div>
         </div>
 
-        {/* Right Column: Feature Bento Cards (Unified Theme) */}
+        {/* Right Column: Feature Cards Bento */}
         <div className="lg:col-span-5 flex flex-col gap-4">
-          {/* Top Card: Expertise */}
-          <div className="p-6 rounded-3xl bg-[#14120b] border border-[#302917] hover:border-[#fac638]/50 transition-all group">
-            <div className="size-11 rounded-xl bg-[#2a220f] border border-[#fac638]/30 flex items-center justify-center text-[#fac638] mb-4 group-hover:scale-105 transition-transform">
+          {/* Card 1: Expertise */}
+          <div className="p-6 sm:p-7 rounded-3xl bg-creamcard border border-purpleborder hover:border-purple/70 transition-all duration-300 group shadow-sm hover:shadow-lg dark:hover:shadow-purple-950/20">
+            <div className="size-11 rounded-xl bg-purple/10 border border-purpleborder flex items-center justify-center text-purple mb-4 group-hover:scale-110 group-hover:bg-purple/20 transition-all">
               <Code2 className="w-5 h-5" />
             </div>
-            <h3 className="text-white text-lg font-bold">Expertise</h3>
-            <p className="text-[#a1a1aa] text-xs sm:text-sm mt-2 leading-relaxed">
-              Specialized in full-stack MERN &amp; Next.js development — building scalable web apps with React.js, Next.js 14, Three.js 3D, GSAP parallax, and cloud deployments.
+            <h3 className="text-espresso text-lg font-bold">Expertise</h3>
+            <p className="text-mocha text-xs sm:text-sm mt-2 leading-relaxed">
+              Specialized in full-stack MERN &amp; Next.js development -- building scalable web apps with React.js, Next.js 14, Three.js 3D, GSAP parallax, and cloud deployments.
             </p>
           </div>
 
           {/* Bottom 2 Cards Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {/* Card 2: Clean Code */}
-            <div className="p-5 rounded-3xl bg-[#14120b] border border-[#302917] hover:border-[#fac638]/50 transition-all group flex flex-col justify-between">
+            <div className="p-5 rounded-3xl bg-creamcard border border-purpleborder hover:border-purple/70 transition-all duration-300 group flex flex-col justify-between shadow-sm hover:shadow-lg dark:hover:shadow-purple-950/20">
               <div>
-                <div className="size-10 rounded-xl bg-[#2a220f] border border-[#fac638]/30 flex items-center justify-center text-[#fac638] mb-3 group-hover:scale-105 transition-transform">
-                  <Sparkles className="w-4 h-4" />
+                <div className="size-10 rounded-xl bg-purple/10 border border-purpleborder flex items-center justify-center text-purple mb-3 group-hover:scale-110 group-hover:bg-purple/20 transition-all">
+                  <CheckCircle2 className="w-4 h-4" />
                 </div>
-                <h4 className="text-white text-base font-bold">Clean Code</h4>
-                <p className="text-[#a1a1aa] text-xs mt-2 leading-relaxed">
+                <h4 className="text-espresso text-base font-bold">Clean Code</h4>
+                <p className="text-mocha text-xs mt-2 leading-relaxed">
                   Writing maintainable, well-structured code using modular architecture, reusable components, and JWT secure auth.
                 </p>
               </div>
             </div>
 
             {/* Card 3: Performance */}
-            <div className="p-5 rounded-3xl bg-[#14120b] border border-[#302917] hover:border-[#fac638]/50 transition-all group flex flex-col justify-between">
+            <div className="p-5 rounded-3xl bg-creamcard border border-purpleborder hover:border-purple/70 transition-all duration-300 group flex flex-col justify-between shadow-sm hover:shadow-lg dark:hover:shadow-purple-950/20">
               <div>
-                <div className="size-10 rounded-xl bg-[#2a220f] border border-[#fac638]/30 flex items-center justify-center text-[#fac638] mb-3 group-hover:scale-105 transition-transform">
+                <div className="size-10 rounded-xl bg-purple/10 border border-purpleborder flex items-center justify-center text-purple mb-3 group-hover:scale-110 group-hover:bg-purple/20 transition-all">
                   <Zap className="w-4 h-4" />
                 </div>
-                <h4 className="text-white text-base font-bold">Performance</h4>
-                <p className="text-[#a1a1aa] text-xs mt-2 leading-relaxed">
-                  Proven 99+ Lighthouse speed score through lazy loading, WebGL shader optimization, and asset pipelines.
+                <h4 className="text-espresso text-base font-bold">Performance</h4>
+                <p className="text-mocha text-xs mt-2 leading-relaxed">
+                  Optimized for sub-second loads, 99+ Lighthouse metrics, smooth 60fps animations, and responsive layouts.
                 </p>
               </div>
             </div>

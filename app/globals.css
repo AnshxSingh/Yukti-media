@@ -1,29 +1,63 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+/* Purple-accent premium theme -- self-hosted Inter via next/font */
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
-  --primary: #fac638;
-  --dark-bg: #231e10;
-  --dark-card: #352d18;
-  --gold-border: #6a5a2f;
-  --gold-text: #ccbc8e;
-  --showcase-accent: #fac638;
+  /* ─── LIGHT MODE (Crisp, High-Contrast Modern Slate Canvas) ─── */
+  --primary: #9333ea;
+  --cream: #fafafa;           /* Clean, bright, elegant off-white canvas */
+  --creamsoft: #f4f4f5;       /* Neutral zinc-100 for nested tags, secondary chips, and subtle panels */
+  --creamcard: #ffffff;       /* Pure brilliant white card surface */
+  --espresso: #09090b;        /* Crisp zinc-950 text with sharp legibility */
+  --mocha: #52525b;           /* Refined zinc-600 for subtitles and descriptions */
+  --purple: #9333ea;          /* Vibrant electric purple */
+  --purpledeep: #7e22ce;      /* Deep royal purple for high-contrast accents */
+  --purplelight: #f3e8ff;     /* Clean lavender for badge backgrounds */
+  --purpleborder: rgba(147, 51, 234, 0.16);  /* Clean, delicate border */
+  --showcase-accent: #9333ea;
+}
+
+.dark {
+  /* ─── DARK MODE (Sleek Obsidian & Midnight Black with Radiant Violet Accents) ─── */
+  --primary: #a855f7;
+  --cream: #09090b;           /* Sleek obsidian midnight black (Vercel/Linear style) */
+  --creamsoft: #141418;       /* Dark charcoal zinc for inner chips and secondary panels */
+  --creamcard: #111114;       /* Polished obsidian card surface */
+  --espresso: #fafafa;        /* Crisp bright white text */
+  --mocha: #a1a1aa;           /* Polished zinc-400 secondary text */
+  --purple: #a855f7;          /* Radiant neon purple */
+  --purpledeep: #c084fc;      /* Lighter violet accent */
+  --purplelight: #e9d5ff;     /* Radiant lilac */
+  --purpleborder: rgba(255, 255, 255, 0.09);  /* Clean modern dark border */
+  --showcase-accent: #a855f7;
 }
 
 html {
   scroll-behavior: smooth;
+  scroll-padding-top: 80px;
+  background-color: var(--cream);
 }
 
 body {
   margin: 0;
   padding: 0;
-  background-color: #231e10;
-  color: #ffffff;
-  font-family: 'Inter', sans-serif;
+  background-color: var(--cream);
+  color: var(--espresso);
+  font-family: var(--font-inter), 'Inter', sans-serif;
   overflow-x: hidden;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* GPU hardware acceleration for smooth 60fps compositing */
+img,
+video {
+  transform: translateZ(0);
+  backface-visibility: hidden;
 }
 
 /* Custom scrollbar */
@@ -31,12 +65,48 @@ body {
   width: 8px;
 }
 ::-webkit-scrollbar-track {
-  background: #231e10;
+  background: var(--cream);
 }
 ::-webkit-scrollbar-thumb {
-  background: #6a5a2f;
+  background: #a855f7;
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #fac638;
+  background: #c084fc;
+}
+
+/* Selection -- purple */
+::selection {
+  background: #a855f7;
+  color: #ffffff;
+}
+
+/* Subtle Muted Purple Brand Button */
+.btn-brand-gradient {
+  background: linear-gradient(135deg, #6b21a8 0%, #4c1d95 100%) !important;
+  color: #ffffff !important;
+  border: 1px solid rgba(168, 85, 247, 0.28) !important;
+  box-shadow: 0 6px 18px -4px rgba(76, 29, 149, 0.35) !important;
+}
+
+.btn-brand-gradient:hover {
+  background: linear-gradient(135deg, #7e22ce 0%, #5b21b6 100%) !important;
+  border-color: rgba(168, 85, 247, 0.45) !important;
+  box-shadow: 0 8px 22px -4px rgba(107, 33, 168, 0.45) !important;
+}
+
+
+
+/* Respect users who prefer reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }

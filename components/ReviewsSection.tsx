@@ -44,13 +44,15 @@ export default function ReviewsSection() {
   };
 
   return (
-    <section id="reviews" className="w-full max-w-[960px] mx-auto px-4 py-8">
-      <h2 className="text-white text-[22px] font-bold leading-tight tracking-[-0.015em] pb-1">
-        Client Reviews
-      </h2>
-      <p className="text-[#ccbc8e] text-sm font-normal leading-normal pb-4">
-        Hear from creators, businesses, and influencers who scaled their visual identity with us.
-      </p>
+    <section id="reviews" className="w-full max-w-[1100px] mx-auto px-4 sm:px-6 py-20 scroll-mt-20 text-espresso">
+      <div className="text-center max-w-xl mx-auto mb-12">
+        <h2 className="text-espresso text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight">
+          Client <span className="inline-block bg-gradient-to-r from-purple via-fuchsia-500 to-indigo-500 bg-clip-text text-transparent">Reviews</span>
+        </h2>
+        <p className="text-mocha text-sm sm:text-base mt-2.5">
+          Hear from creators, businesses, and influencers who scaled their visual identity with us.
+        </p>
+      </div>
 
       <div className="flex flex-col gap-4">
         {REVIEWS.map((rev) => {
@@ -58,7 +60,7 @@ export default function ReviewsSection() {
           return (
             <div
               key={rev.id}
-              className="flex flex-col gap-3 rounded-xl border border-[#6a5a2f]/40 bg-[#352d18]/70 p-5 hover:border-[#fac638]/60 transition-all"
+              className="flex flex-col gap-4 rounded-2xl border border-purpleborder bg-creamcard p-6 hover:border-purple/70 transition-all duration-300 shadow-sm hover:shadow-lg dark:hover:shadow-purple-950/20"
             >
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
@@ -66,44 +68,44 @@ export default function ReviewsSection() {
                     href={rev.instagram}
                     target="_blank"
                     rel="noreferrer"
-                    className="size-10 rounded-full overflow-hidden border border-[#fac638]/40 hover:scale-105 transition-transform"
+                    className="size-11 rounded-full overflow-hidden border border-purpleborder hover:scale-105 transition-transform"
                   >
-                    <img src={rev.avatar} alt={rev.name} className="w-full h-full object-cover" />
+                    <img src={rev.avatar} alt={rev.name} className="w-full h-full object-cover" loading="lazy" />
                   </a>
                   <div>
                     <a
                       href={rev.instagram}
                       target="_blank"
                       rel="noreferrer"
-                      className="text-white text-base font-semibold hover:text-[#fac638] transition-colors"
+                      className="text-espresso text-base font-semibold hover:text-purple transition-colors"
                     >
                       {rev.name}
                     </a>
-                    <p className="text-[#ccbc8e] text-xs">{rev.date}</p>
+                    <p className="text-mocha text-xs">{rev.date}</p>
                   </div>
                 </div>
 
                 {/* Rating Stars */}
-                <div className="flex gap-0.5 text-[#fac638]">
+                <div className="flex gap-0.5 text-amber-400">
                   {[...Array(5)].map((_, i) => (
                     <Star key={i} className="w-4 h-4 fill-current" />
                   ))}
                 </div>
               </div>
 
-              <p className="text-white/90 text-sm leading-relaxed">{rev.review}</p>
+              <p className="text-espresso/90 text-sm leading-relaxed">{rev.review}</p>
 
               {/* Like action */}
               <div className="flex items-center gap-2 pt-1">
                 <button
                   onClick={() => toggleLike(rev.id)}
-                  className={`flex items-center gap-1.5 text-xs font-semibold px-3 py-1 rounded-full border transition-all ${
+                  className={`flex items-center gap-1.5 text-xs font-semibold px-3.5 py-1.5 rounded-full border transition-all ${
                     isLiked
-                      ? 'bg-red-500/10 border-red-500/40 text-red-400'
-                      : 'bg-white/5 border-white/10 text-[#ccbc8e] hover:text-white'
+                      ? 'bg-purple/20 border-purple text-purpledeep dark:text-purplelight'
+                      : 'bg-creamsoft/50 dark:bg-white/5 border border-purpleborder text-mocha hover:text-espresso hover:border-purple'
                   }`}
                 >
-                  <Heart className={`w-3.5 h-3.5 ${isLiked ? 'fill-current' : ''}`} />
+                  <Heart className={`w-3.5 h-3.5 ${isLiked ? 'fill-current text-purple' : ''}`} />
                   <span>{rev.likes + (isLiked ? 1 : 0)}</span>
                 </button>
               </div>

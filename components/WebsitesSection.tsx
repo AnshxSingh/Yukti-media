@@ -1,457 +1,385 @@
 'use client';
 
-import React, { useEffect, useRef, useState } from 'react';
-import * as THREE from 'three';
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
-import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js';
-import { ChevronLeft, ChevronRight, ArrowUpRight } from 'lucide-react';
+import React, { useState } from 'react';
+import Image from 'next/image';
+import {
+  ExternalLink,
+  Github,
+  ChevronLeft,
+  ChevronRight,
+  Layers,
+  CheckCircle2,
+  ArrowUpRight,
+  Globe,
+  Zap,
+  BookOpen
+} from 'lucide-react';
 
-const PROJECTS = [
+interface Project {
+  id: string;
+  title: string;
+  subtitle?: string;
+  categories: string[];
+  badge?: string;
+  highlights?: string[];
+  description: string;
+  tech: string[];
+  liveUrl?: string;
+  githubUrl?: string;
+  image: string;
+}
+
+const PROJECTS: Project[] = [
   {
-    id: 0,
-    title: 'Aura Luxe',
-    subtitle: 'Luxury E-Commerce Platform',
-    category: 'E-Commerce',
-    description: 'A high-conversion online boutique for a luxury fashion brand. Features seamless checkout, dynamic product showcases, and lightning-fast loading.',
-    metrics: ['+185% Conversion', 'Sub-1s Load', '5★ UX Rating'],
-    tech: ['Next.js', 'Tailwind CSS', 'Stripe', 'Framer Motion'],
+    id: 'vegan-prophecy',
+    title: 'Vegan Prophecy',
+    subtitle: 'Vegan Community Platform',
+    categories: ['Course Selling', 'Web Apps', 'Full Stack'],
+    badge: 'Course Selling',
+    highlights: ['Admin Panel', 'User friendly UI'],
+    description:
+      'A high-conversion online community platform and course boutique. Features seamless Razorpay checkout, dynamic course showcases, Clerk authentication, and lightning-fast loading.',
+    tech: ['React', 'Tailwind CSS', 'Razorpay', 'Clerk'],
+    liveUrl: 'https://www.instagram.com/veganprophecy2030/',
     image: '/assets/images/websites/site1.jpg',
-    accentColor: '#fac638'
   },
   {
-    id: 1,
-    title: 'Nexus Analytics',
-    subtitle: 'SaaS Growth & Metrics Dashboard',
-    category: 'SaaS Platform',
-    description: 'An intuitive analytics platform built for high-growth startups. Real-time data streams, custom reporting widgets, and modern responsive charts.',
-    metrics: ['+240% Signups', 'Real-time Sync', '99.9% Uptime'],
-    tech: ['React', 'TypeScript', 'Supabase', 'Chart.js'],
-    image: '/assets/images/websites/site2.jpg',
-    accentColor: '#38bdf8'
+    id: 'yash-collection',
+    title: 'Yash Collection',
+    subtitle: 'Kids Wear Wholesale Portal',
+    categories: ['Web Apps', 'Full Stack'],
+    badge: '+140% Orders',
+    highlights: ['B2B Wholesale', 'Bulk Ordering'],
+    description:
+      'A B2B wholesale ordering portal that lets retail clients browse the full catalog and place bulk orders online 24/7 with zero friction.',
+    tech: ['Next.js 14', 'TypeScript', 'Tailwind CSS', 'PostgreSQL'],
+    liveUrl: 'https://yashcollection.app',
+    image: '/assets/images/websites/site2.png',
   },
   {
-    id: 2,
-    title: 'Luminary Studio',
-    subtitle: 'AI Media & Prompt Platform',
-    category: 'AI Creative Platform',
-    description: 'A sleek, futuristic portal for an AI creative suite. Features interactive prompt playgrounds, live video renderers, and viral onboarding flows.',
-    metrics: ['+320% User Growth', 'AI-Powered UX', 'Viral Launch'],
-    tech: ['Vite', 'Three.js', 'GSAP', 'Tailwind'],
-    image: '/assets/images/websites/site3.jpg',
-    accentColor: '#d946ef'
+    id: 'staynest',
+    title: 'StayNest',
+    subtitle: 'Vacation Rental Marketplace',
+    categories: ['Full Stack', 'Web Apps'],
+    badge: 'MERN Marketplace',
+    highlights: ['Conflict-Free Booking', 'Cloudinary CDN'],
+    description:
+      'A scalable MERN-stack property rental marketplace with conflict-resistant booking system, CRUD operations for hundreds of listings, and Cloudinary-powered media delivery.',
+    tech: ['React', 'Node.js', 'MongoDB', 'Cloudinary'],
+    liveUrl: '#',
+    image: '/assets/images/websites/site3.png',
   },
-  {
-    id: 3,
-    title: 'Verdant Living',
-    subtitle: 'Modern Architecture & Interiors',
-    category: 'Brand & Agency',
-    description: 'An immersive editorial portfolio showcasing luxury interior design and architectural projects with smooth parallax storytelling and lead booking.',
-    metrics: ['+95% Qualified Leads', 'Award Winner', 'Premium Visuals'],
-    tech: ['Next.js', 'WebGL', 'Tailwind CSS', 'Prismic'],
-    image: '/assets/images/websites/site4.jpg',
-    accentColor: '#34d399'
-  }
+];
+
+const CATEGORIES = [
+  { id: 'All', label: 'All', icon: Layers },
+  { id: 'Course Selling', label: 'Course Selling', icon: BookOpen },
+  { id: 'Web Apps', label: 'Web Apps', icon: Globe },
+  { id: 'Full Stack', label: 'Full Stack', icon: Zap },
 ];
 
 export default function WebsitesSection() {
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
-  const isTransitioningRef = useRef(false);
-  const loadedImagesRef = useRef<{ [key: number]: HTMLImageElement }>({});
-  const drawScreenRef = useRef<((idx: number, opacity?: number, prevIdx?: number | null, blend?: number) => void) | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<string>('All');
+  const [startIndex, setStartIndex] = useState(0);
+  const [touchStartX, setTouchStartX] = useState<number | null>(null);
 
-  // Navigate to slide
-  const navigateTo = (newIndex: number) => {
-    if (isTransitioningRef.current) return;
-    const total = PROJECTS.length;
-    const target = ((newIndex % total) + total) % total;
-    if (target === currentIndex) return;
+  const filteredProjects =
+    selectedCategory === 'All'
+      ? PROJECTS
+      : PROJECTS.filter((p) => p.categories.includes(selectedCategory));
 
-    const prev = currentIndex;
-    setCurrentIndex(target);
-    isTransitioningRef.current = true;
+  const total = filteredProjects.length;
 
-    // Crossfade screenshot
-    let progress = 0;
-    const startTime = performance.now();
-    const duration = 350;
-
-    const animateCrossfade = (time: number) => {
-      const elapsed = time - startTime;
-      progress = Math.min(elapsed / duration, 1);
-      const eased = progress < 0.5 ? 2 * progress * progress : -1 + (4 - 2 * progress) * progress;
-
-      drawScreenRef.current?.(target, 1, prev, eased);
-
-      if (progress < 1) {
-        requestAnimationFrame(animateCrossfade);
-      } else {
-        drawScreenRef.current?.(target);
-        isTransitioningRef.current = false;
-      }
-    };
-    requestAnimationFrame(animateCrossfade);
+  const handlePrev = () => {
+    setStartIndex((prev) => (prev - 1 + total) % total);
   };
 
-  // 3D Computer Screen Canvas Setup
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    const container = containerRef.current;
-    if (!canvas || !container) return;
+  const handleNext = () => {
+    setStartIndex((prev) => (prev + 1) % total);
+  };
 
-    const renderer = new THREE.WebGLRenderer({
-      canvas,
-      alpha: true,
-      antialias: true,
-      powerPreference: 'high-performance'
-    });
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2.5));
-    renderer.setSize(container.clientWidth, container.clientHeight);
-    renderer.outputColorSpace = THREE.SRGBColorSpace;
-    renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.4;
+  // Touch Swipe Handlers for mobile
+  const handleTouchStart = (e: React.TouchEvent) => {
+    setTouchStartX(e.touches[0].clientX);
+  };
 
-    const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(36, container.clientWidth / container.clientHeight, 0.1, 100);
-    camera.position.set(0, 0, 1.32);
-    camera.lookAt(0, 0, 0);
-
-    // Studio 3-Point Lighting
-    const ambient = new THREE.AmbientLight(0xffffff, 1.4);
-    scene.add(ambient);
-
-    const keyLight = new THREE.DirectionalLight(0xfff8ee, 3.2);
-    keyLight.position.set(3, 4, 3.5);
-    scene.add(keyLight);
-
-    const fillLight = new THREE.DirectionalLight(0xd8e8ff, 2.0);
-    fillLight.position.set(-3.5, 1.5, 2.5);
-    scene.add(fillLight);
-
-    const rimLight = new THREE.DirectionalLight(0xfac638, 2.4);
-    rimLight.position.set(0, 3.5, -2.5);
-    scene.add(rimLight);
-
-    // 2D Screen Texture
-    const TEX_W = 1920;
-    const TEX_H = 1184;
-    const screenCanvas = document.createElement('canvas');
-    screenCanvas.width = TEX_W;
-    screenCanvas.height = TEX_H;
-    const ctx = screenCanvas.getContext('2d', { alpha: false });
-    if (ctx) {
-      ctx.imageSmoothingEnabled = true;
-      ctx.imageSmoothingQuality = 'high';
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (touchStartX === null) return;
+    const touchEndX = e.changedTouches[0].clientX;
+    const diff = touchStartX - touchEndX;
+    if (diff > 50) {
+      handleNext();
+    } else if (diff < -50) {
+      handlePrev();
     }
+    setTouchStartX(null);
+  };
 
-    const screenTexture = new THREE.CanvasTexture(screenCanvas);
-    screenTexture.colorSpace = THREE.SRGBColorSpace;
-    screenTexture.generateMipmaps = false;
-    screenTexture.minFilter = THREE.LinearFilter;
-    screenTexture.magFilter = THREE.LinearFilter;
-
-    // Preload project screenshots
-    PROJECTS.forEach((p, idx) => {
-      const img = new Image();
-      img.crossOrigin = 'anonymous';
-      img.src = p.image;
-      img.onload = () => {
-        loadedImagesRef.current[idx] = img;
-        if (idx === currentIndex) {
-          drawScreen(currentIndex);
-        }
-      };
-    });
-
-    const drawImageToScreen = (img: HTMLImageElement, alpha = 1) => {
-      if (!ctx || !img || !img.complete || img.naturalWidth === 0) return;
-      ctx.globalAlpha = alpha;
-      const nw = img.naturalWidth;
-      const nh = img.naturalHeight;
-      const cropX = nw * 0.032;
-      const cropY = nh * 0.042;
-      const srcW = nw - cropX * 2;
-      const srcH = nh - cropY * 2;
-      ctx.drawImage(img, cropX, cropY, srcW, srcH, 0, 0, TEX_W, TEX_H);
-    };
-
-    const drawScreen = (index: number, opacity = 1, prevIndex: number | null = null, blendAlpha = 0) => {
-      if (!ctx) return;
-      ctx.clearRect(0, 0, TEX_W, TEX_H);
-
-      if (prevIndex !== null && loadedImagesRef.current[prevIndex]) {
-        drawImageToScreen(loadedImagesRef.current[prevIndex], 1 - blendAlpha);
-      }
-
-      if (loadedImagesRef.current[index]) {
-        drawImageToScreen(loadedImagesRef.current[index], prevIndex !== null ? blendAlpha : opacity);
-      } else {
-        const p = PROJECTS[index];
-        ctx.globalAlpha = 1;
-        ctx.fillStyle = '#0f0e0c';
-        ctx.fillRect(0, 0, TEX_W, TEX_H);
-        ctx.fillStyle = p.accentColor;
-        ctx.font = 'bold 64px sans-serif';
-        ctx.textAlign = 'center';
-        ctx.fillText(p.title, TEX_W / 2, TEX_H / 2 - 20);
-      }
-
-      ctx.globalAlpha = 1;
-      screenTexture.needsUpdate = true;
-    };
-    drawScreenRef.current = drawScreen;
-
-    // Load Computer Screen GLB
-    const loader = new GLTFLoader();
-    const dracoLoader = new DRACOLoader();
-    dracoLoader.setDecoderPath('https://cdn.jsdelivr.net/npm/three@0.167.0/examples/jsm/libs/draco/');
-    loader.setDRACOLoader(dracoLoader);
-
-    const modelGroup = new THREE.Group();
-    scene.add(modelGroup);
-
-    loader.load(
-      '/assets/Computer Screen.glb',
-      (gltf) => {
-        const model = gltf.scene;
-        model.rotation.y = Math.PI; // Face camera
-
-        const pivot = new THREE.Group();
-        pivot.add(model);
-
-        const screenMaterial = new THREE.MeshBasicMaterial({
-          map: screenTexture,
-          side: THREE.DoubleSide,
-          toneMapped: false
-        });
-
-        const bodyMaterial = new THREE.MeshStandardMaterial({
-          color: 0xd8dde4,
-          roughness: 0.22,
-          metalness: 0.88,
-          envMapIntensity: 1.6
-        });
-
-        const standMaterial = new THREE.MeshStandardMaterial({
-          color: 0xe8ecf2,
-          roughness: 0.18,
-          metalness: 0.92,
-          envMapIntensity: 1.8
-        });
-
-        model.traverse((child) => {
-          if ((child as THREE.Mesh).isMesh) {
-            const mesh = child as THREE.Mesh;
-            const posCount = mesh.geometry?.attributes?.position?.count || 0;
-
-            if (posCount === 4) {
-              const uvData = new Float32Array([0, 0, 1, 0, 1, 1, 0, 1]);
-              mesh.geometry.setAttribute('uv', new THREE.BufferAttribute(uvData, 2));
-              mesh.material = screenMaterial;
-            } else {
-              const mat = mesh.name?.toLowerCase().includes('stand') ? standMaterial : bodyMaterial;
-              mesh.material = mat;
-            }
-          }
-        });
-
-        const box = new THREE.Box3().setFromObject(pivot);
-        const size = box.getSize(new THREE.Vector3());
-        const maxDim = Math.max(size.x, size.y, size.z);
-        const targetScale = 0.88 / maxDim;
-        pivot.scale.setScalar(targetScale);
-
-        const box2 = new THREE.Box3().setFromObject(pivot);
-        const center2 = box2.getCenter(new THREE.Vector3());
-        pivot.position.sub(center2);
-
-        modelGroup.add(pivot);
-        drawScreen(currentIndex);
-      },
-      undefined,
-      (err) => console.warn('Showcase GLB load error:', err)
-    );
-
-    // Mouse parallax isolated to container hover
-    const mouse = { x: 0, y: 0 };
-    const smooth = { x: 0, y: 0 };
-
-    const onMouseMove = (e: MouseEvent) => {
-      const rect = container.getBoundingClientRect();
-      mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
-      mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
-    };
-    const onMouseLeave = () => {
-      mouse.x = 0;
-      mouse.y = 0;
-    };
-
-    container.addEventListener('mousemove', onMouseMove);
-    container.addEventListener('mouseleave', onMouseLeave);
-
-    const onResize = () => {
-      if (!container) return;
-      const w = container.clientWidth;
-      const h = container.clientHeight;
-      camera.aspect = w / h;
-      camera.updateProjectionMatrix();
-      renderer.setSize(w, h);
-    };
-    window.addEventListener('resize', onResize);
-
-    let reqId: number;
-    const clock = new THREE.Clock();
-
-    const animate = () => {
-      reqId = requestAnimationFrame(animate);
-      const elapsed = clock.getElapsedTime();
-
-      smooth.x += (mouse.x - smooth.x) * 0.05;
-      smooth.y += (mouse.y - smooth.y) * 0.05;
-
-      if (modelGroup) {
-        modelGroup.position.y = Math.sin(elapsed * 0.8) * 0.012;
-        modelGroup.rotation.y = smooth.x * 0.12;
-        modelGroup.rotation.x = -smooth.y * 0.08;
-      }
-
-      renderer.render(scene, camera);
-    };
-    animate();
-
-    return () => {
-      container.removeEventListener('mousemove', onMouseMove);
-      container.removeEventListener('mouseleave', onMouseLeave);
-      window.removeEventListener('resize', onResize);
-      cancelAnimationFrame(reqId);
-      renderer.dispose();
-    };
-  }, []);
-
-  const activeProject = PROJECTS[currentIndex];
+  // Compute visible items with wrap-around
+  const visibleProjects = Array.from({ length: Math.min(3, total) }, (_, i) => {
+    return filteredProjects[(startIndex + i) % total];
+  });
 
   return (
-    <section id="websites" className="w-full max-w-[960px] mx-auto px-4 py-8">
-      <h2 className="text-white text-[22px] font-bold leading-tight tracking-[-0.015em] pb-1">
-        Websites
-      </h2>
-      <p className="text-[#ccbc8e] text-sm font-normal leading-normal pb-3">
-        Crafting high-converting, modern websites tailored for growth and performance.
-      </p>
+    <section id="websites" className="w-full max-w-[1360px] mx-auto px-4 sm:px-6 py-20 sm:py-24 scroll-mt-20 text-espresso transition-colors duration-300">
+      {/* Header */}
+      <div className="text-center max-w-2xl mx-auto mb-10 sm:mb-12 px-2">
+        <h2 className="text-espresso text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight">
+          Websites
+        </h2>
+        <p className="text-mocha text-sm sm:text-base mt-2.5 sm:mt-3 leading-relaxed">
+          Crafting high-converting, modern websites tailored for growth and performance.
+        </p>
 
-      {/* Showcase Card */}
-      <div className="rounded-2xl border border-[#6a5a2f]/40 bg-[#2a2414] p-4 sm:p-6 shadow-xl">
-        <div className="grid grid-cols-1 md:grid-cols-[1.15fr_1fr] gap-6 items-center">
-          {/* Left Column: 3D Monitor Visual & Arrows */}
-          <div className="flex items-center justify-center gap-2 sm:gap-4 w-full">
-            <button
-              onClick={() => navigateTo(currentIndex - 1)}
-              className="size-8 sm:size-10 rounded-full bg-[#231e10] border border-[#fac638]/40 text-[#fac638] flex items-center justify-center hover:scale-110 active:scale-95 transition-all shrink-0 z-10"
-              aria-label="Previous project"
-            >
-              <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5" />
-            </button>
-
-            {/* 3D Canvas */}
-            <div className="relative flex-1 max-w-[260px] sm:max-w-[400px] flex items-center justify-center">
-              <div
-                ref={containerRef}
-                className="relative w-full h-[195px] sm:h-[300px] cursor-grab active:cursor-grabbing flex items-center justify-center"
+        {/* Category Filters */}
+        <div className="flex flex-wrap items-center justify-center gap-2 mt-6 sm:mt-8">
+          {CATEGORIES.map((cat) => {
+            const isSelected = selectedCategory === cat.id;
+            const Icon = cat.icon;
+            return (
+              <button
+                key={cat.id}
+                type="button"
+                onClick={() => {
+                  setSelectedCategory(cat.id);
+                  setStartIndex(0);
+                }}
+                className={`flex items-center gap-1.5 sm:gap-2 px-3.5 py-2 sm:px-5 sm:py-2.5 rounded-full text-xs sm:text-sm font-semibold transition-all duration-200 cursor-pointer ${
+                  isSelected
+                    ? 'btn-brand-gradient shadow-lg shadow-purple-600/30 scale-105'
+                    : 'bg-creamcard text-espresso hover:text-purple border border-purpleborder hover:border-purple hover:bg-creamsoft'
+                }`}
+                style={isSelected ? { background: 'linear-gradient(135deg, #9333ea 0%, #c026d3 50%, #4f46e5 100%)', color: '#ffffff' } : undefined}
               >
-                <canvas ref={canvasRef} className="w-full h-full block object-contain" />
-              </div>
-            </div>
-
-            <button
-              onClick={() => navigateTo(currentIndex + 1)}
-              className="size-8 sm:size-10 rounded-full bg-[#231e10] border border-[#fac638]/40 text-[#fac638] flex items-center justify-center hover:scale-110 active:scale-95 transition-all shrink-0 z-10"
-              aria-label="Next project"
-            >
-              <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5" />
-            </button>
-          </div>
-
-          {/* Right Column: Project Info Panel */}
-          <div className="flex flex-col">
-            <div className="flex items-center justify-between gap-2 mb-2">
-              <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-[#fac638]/10 text-[#fac638] border border-[#fac638]/30">
-                {activeProject.category}
-              </span>
-              <span className="text-xs text-[#ccbc8e]/60 font-semibold">
-                0{activeProject.id + 1} / 0{PROJECTS.length}
-              </span>
-            </div>
-
-            <h3 className="text-white text-xl sm:text-2xl font-bold leading-tight mb-1">
-              {activeProject.title}
-            </h3>
-            <p className="text-[#ccbc8e] text-sm font-medium mb-3">
-              {activeProject.subtitle}
-            </p>
-            <p className="text-white/70 text-xs sm:text-sm leading-relaxed mb-4">
-              {activeProject.description}
-            </p>
-
-            {/* Metrics */}
-            <div className="flex flex-wrap gap-2 mb-3">
-              {activeProject.metrics.map((m, i) => (
-                <span
-                  key={i}
-                  className="px-2.5 py-1 rounded-md text-xs font-semibold bg-[#22c55e]/10 text-[#22c55e] border border-[#22c55e]/25"
-                >
-                  {m}
-                </span>
-              ))}
-            </div>
-
-            {/* Tech Tags */}
-            <div className="flex flex-wrap gap-1.5 mb-5">
-              {activeProject.tech.map((t, i) => (
-                <span
-                  key={i}
-                  className="px-2 py-0.5 rounded text-[11px] font-medium bg-white/5 text-white/80 border border-white/10"
-                >
-                  {t}
-                </span>
-              ))}
-            </div>
-
-            {/* Actions */}
-            <div className="flex items-center gap-3">
-              <a
-                href="#contact"
-                className="flex items-center gap-1.5 px-4 py-2 rounded-full bg-[#fac638] text-[#231e10] text-xs sm:text-sm font-bold hover:scale-105 active:scale-95 transition-all shadow-md shadow-[#fac638]/10"
-              >
-                <span>Get a Website</span>
-                <ArrowUpRight className="w-3.5 h-3.5" />
-              </a>
-              <a
-                href="#contact"
-                className="px-4 py-2 rounded-full bg-[#352d18] border border-[#6a5a2f] text-white text-xs sm:text-sm font-semibold hover:border-[#fac638] transition-all"
-              >
-                Let's Talk
-              </a>
-            </div>
-          </div>
-        </div>
-
-        {/* Bottom Pagination Dots */}
-        <div className="flex items-center justify-center gap-2 mt-4 pt-3 border-t border-[#6a5a2f]/20">
-          {PROJECTS.map((_, idx) => (
-            <button
-              key={idx}
-              onClick={() => navigateTo(idx)}
-              className={`h-2 rounded-full transition-all duration-300 ${
-                idx === currentIndex
-                  ? 'w-6 bg-[#fac638]'
-                  : 'w-2 bg-[#6a5a2f]/50 hover:bg-[#fac638]/50'
-              }`}
-              aria-label={`Go to slide ${idx + 1}`}
-            />
-          ))}
+                <Icon className={`w-3.5 h-3.5 ${isSelected ? 'text-white' : 'text-purple'}`} />
+                <span>{cat.label}</span>
+              </button>
+            );
+          })}
         </div>
       </div>
+
+      {/* Carousel Container with Touch Gestures */}
+      <div
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
+        className="relative flex items-center gap-3 sm:gap-5 touch-pan-y"
+      >
+        {/* Tablet Left Arrow Button (Only needed when fewer than 3 items shown per row) */}
+        {total > 1 && (
+          <button
+            onClick={handlePrev}
+            className="hidden md:flex lg:hidden size-11 rounded-full bg-creamcard border border-purpleborder text-espresso hover:text-white hover:bg-purple hover:border-purple items-center justify-center transition-all shrink-0 shadow-sm hover:scale-105 active:scale-95 z-10 cursor-pointer"
+            aria-label="Previous Projects"
+          >
+            <ChevronLeft className="w-5 h-5" />
+          </button>
+        )}
+
+        {/* Cards Grid */}
+        <div className={`grid gap-5 sm:gap-6 flex-1 w-full ${
+          total === 1
+            ? 'grid-cols-1 max-w-md mx-auto'
+            : total === 2
+            ? 'grid-cols-1 md:grid-cols-2 max-w-3xl mx-auto'
+            : 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'
+        }`}>
+          {visibleProjects.map((project, idx) => (
+            <div
+              key={`${project.id}-${idx}`}
+              className={`rounded-3xl bg-creamcard border border-purpleborder hover:border-purple/70 overflow-hidden flex flex-col justify-between transition-all duration-300 group hover:-translate-y-1 shadow-sm hover:shadow-lg dark:hover:shadow-purple-950/20 ${
+                idx === 0 ? 'flex' : idx === 1 ? 'hidden md:flex' : 'hidden lg:flex'
+              }`}
+            >
+              {/* Top Media Container with sleek device mockup */}
+              <div className="relative w-full h-52 sm:h-56 bg-black/10 dark:bg-black/30 overflow-hidden border-b border-purpleborder flex items-center justify-center p-2.5 sm:p-3">
+                {/* Floating Metric Badge */}
+                {project.badge && (
+                  <div className="absolute top-3 left-3 z-30 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-creamcard/90 backdrop-blur-md border border-purpleborder text-purpledeep dark:text-purplelight text-xs font-bold shadow-sm">
+                    <CheckCircle2 className="w-3 h-3 text-purple" />
+                    <span>{project.badge}</span>
+                  </div>
+                )}
+
+                {/* Top Right Action Icons */}
+                <div className="absolute top-3 right-3 z-30 flex items-center gap-1.5">
+                  {project.liveUrl && project.liveUrl !== '#' && (
+                    <a
+                      href={project.liveUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="size-8 rounded-full bg-black/70 backdrop-blur-md border border-white/20 hover:border-purple-400 text-zinc-300 hover:text-white flex items-center justify-center transition-all hover:scale-110"
+                      aria-label="Live Demo"
+                    >
+                      <ExternalLink className="w-3.5 h-3.5" />
+                    </a>
+                  )}
+                  {project.githubUrl && (
+                    <a
+                      href={project.githubUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="size-8 rounded-full bg-black/70 backdrop-blur-md border border-white/20 hover:border-purple-400 text-zinc-300 hover:text-white flex items-center justify-center transition-all hover:scale-110"
+                      aria-label="GitHub Repository"
+                    >
+                      <Github className="w-3.5 h-3.5" />
+                    </a>
+                  )}
+                </div>
+
+                {/* Real Website Screenshot in sleek Browser Frame */}
+                <div className="absolute inset-0 z-10 p-2.5 sm:p-3 flex items-center justify-center">
+                  <div className="relative w-full h-full rounded-xl overflow-hidden border border-white/15 dark:border-white/10 shadow-2xl bg-neutral-900 group-hover:scale-[1.02] transition-transform duration-500 flex flex-col">
+                    {/* Browser Window Header */}
+                    <div className="h-5 bg-neutral-900 border-b border-white/10 px-2.5 flex items-center justify-between shrink-0">
+                      <div className="flex items-center gap-1">
+                        <span className="size-1.5 rounded-full bg-rose-500/80" />
+                        <span className="size-1.5 rounded-full bg-amber-500/80" />
+                        <span className="size-1.5 rounded-full bg-emerald-500/80" />
+                      </div>
+                      <div className="px-2 py-0.5 rounded-full bg-neutral-800/90 text-[9px] text-zinc-300 font-mono truncate max-w-[130px] sm:max-w-[150px]">
+                        {project.liveUrl && project.liveUrl !== '#' ? project.liveUrl.replace('https://', '').replace('www.', '') : `${project.id}.yuktimedia.in`}
+                      </div>
+                      <div className="w-4" />
+                    </div>
+                    {/* Screenshot Viewport */}
+                    <div className="relative flex-1 w-full bg-neutral-950 overflow-hidden">
+                      <Image
+                        src={project.image}
+                        alt={`${project.title} website screenshot`}
+                        fill
+                        sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw"
+                        className="object-cover object-top"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Card Body */}
+              <div className="p-4 sm:p-6 flex-1 flex flex-col justify-between">
+                <div>
+                  {/* Category & Subtitle */}
+                  <div className="flex items-center justify-between gap-2 mb-2">
+                    <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-purple/15 text-purple border border-purple/30">
+                      {project.badge || project.categories[0]}
+                    </span>
+                    {project.subtitle && (
+                      <span className="text-xs text-mocha font-medium truncate">
+                        {project.subtitle}
+                      </span>
+                    )}
+                  </div>
+
+                  <h3 className="text-espresso text-lg sm:text-xl font-bold tracking-tight group-hover:text-purple transition-colors mb-2">
+                    {project.title}
+                  </h3>
+
+                  <p className="text-mocha text-xs sm:text-sm leading-relaxed line-clamp-3">
+                    {project.description}
+                  </p>
+
+                  {/* Highlights (Admin Panel, User friendly UI, etc.) */}
+                  {project.highlights && project.highlights.length > 0 && (
+                    <div className="flex flex-wrap gap-1.5 mt-3">
+                      {project.highlights.map((h, hIdx) => (
+                        <span
+                          key={hIdx}
+                          className="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30"
+                        >
+                          {h}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                <div className="mt-5 pt-4 border-t border-purpleborder">
+                  {/* Tech Stack Badges */}
+                  <div className="flex flex-wrap gap-1.5 mb-4">
+                    {project.tech.map((t, tIdx) => (
+                      <span
+                        key={tIdx}
+                        className="px-2.5 py-1 rounded-lg bg-purple/10 border border-purpleborder text-purpledeep dark:text-purplelight text-[11px] font-medium"
+                      >
+                        {t}
+                      </span>
+                    ))}
+                  </div>
+
+                  {/* Action Links - Rich Brand Gradient & Glass Button */}
+                  <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 pt-1">
+                    <a
+                      href={project.liveUrl && project.liveUrl !== '#' ? project.liveUrl : '#contact'}
+                      target={project.liveUrl && project.liveUrl !== '#' ? '_blank' : undefined}
+                      rel={project.liveUrl && project.liveUrl !== '#' ? 'noreferrer' : undefined}
+                      style={{ background: 'linear-gradient(135deg, #9333ea 0%, #c026d3 50%, #4f46e5 100%)' }}
+                      className="btn-brand-gradient flex-1 inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-full text-white font-bold text-xs sm:text-sm transition-all shadow-md shadow-purple-600/30 hover:brightness-110 hover:scale-105 active:scale-95 no-underline"
+                    >
+                      <span>Visit Website</span>
+                      <ArrowUpRight className="w-3.5 h-3.5" />
+                    </a>
+
+                    <a
+                      href="#contact"
+                      className="flex-1 sm:flex-none inline-flex items-center justify-center gap-1 px-4 py-2.5 rounded-full bg-creamcard border border-purpleborder hover:border-purple/80 hover:bg-purple/10 text-xs sm:text-sm font-semibold text-espresso hover:text-purple transition-all no-underline"
+                    >
+                      <span>Let&apos;s Talk</span>
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Tablet Right Arrow Button */}
+        {total > 1 && (
+          <button
+            onClick={handleNext}
+            className="hidden md:flex lg:hidden size-11 rounded-full bg-creamcard border border-purpleborder text-espresso hover:text-white hover:bg-purple hover:border-purple items-center justify-center transition-all shrink-0 shadow-sm hover:scale-105 active:scale-95 z-10 cursor-pointer"
+            aria-label="Next Projects"
+          >
+            <ChevronRight className="w-5 h-5" />
+          </button>
+        )}
+      </div>
+
+      {/* Mobile & Tablet Pagination Controls */}
+      {total > 1 && (
+        <div className="flex lg:hidden items-center justify-center gap-4 mt-8">
+          <button
+            onClick={handlePrev}
+            className="size-9 rounded-full bg-creamcard border border-purpleborder text-espresso hover:text-purple flex items-center justify-center shadow-sm active:scale-95 cursor-pointer"
+            aria-label="Previous Project"
+          >
+            <ChevronLeft className="w-4 h-4" />
+          </button>
+
+          <div className="flex items-center gap-2">
+            {Array.from({ length: total }).map((_, idx) => (
+              <button
+                key={idx}
+                onClick={() => setStartIndex(idx)}
+                aria-label={`Go to slide ${idx + 1}`}
+                className={`h-2 rounded-full transition-all duration-300 cursor-pointer ${
+                  startIndex === idx
+                    ? 'w-7 bg-purple shadow-lg shadow-purple/40'
+                    : 'w-2 bg-espresso/20 hover:bg-espresso/40 dark:bg-white/20 dark:hover:bg-white/40'
+                }`}
+              />
+            ))}
+          </div>
+
+          <button
+            onClick={handleNext}
+            className="size-9 rounded-full bg-creamcard border border-purpleborder text-espresso hover:text-purple flex items-center justify-center shadow-sm active:scale-95 cursor-pointer"
+            aria-label="Next Project"
+          >
+            <ChevronRight className="w-4 h-4" />
+          </button>
+        </div>
+      )}
     </section>
   );
 }
