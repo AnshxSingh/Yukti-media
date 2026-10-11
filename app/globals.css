@@ -60,19 +60,19 @@ video {
   backface-visibility: hidden;
 }
 
-/* Custom scrollbar */
+/* Custom scrollbar -- sleek, subtle & translucent */
 ::-webkit-scrollbar {
-  width: 8px;
+  width: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: var(--cream);
+  background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: #a855f7;
-  border-radius: 4px;
+  background: rgba(168, 85, 247, 0.28);
+  border-radius: 9999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #c084fc;
+  background: rgba(168, 85, 247, 0.55);
 }
 
 /* Selection -- purple */
