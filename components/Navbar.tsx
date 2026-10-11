@@ -33,17 +33,11 @@ export default function Navbar() {
   };
 
   return (
-    <header className="sticky top-0 z-50 flex items-center justify-between px-4 sm:px-8 py-3 bg-cream/85 dark:bg-[#09090b]/85 backdrop-blur-xl border-b border-purpleborder shadow-sm dark:shadow-black/40 transition-all duration-300 max-w-full">
+    <header className="sticky top-0 z-50 flex items-center justify-between border-b border-[#6a5a2f]/40 px-5 sm:px-10 py-3 bg-[#231e10]/90 backdrop-blur-md">
       {/* Brand */}
-      <a href="#" className="flex items-center gap-2.5 no-underline group shrink-0">
-        <div className="size-9 rounded-xl overflow-hidden flex items-center justify-center bg-creamcard dark:bg-[#141418] border border-purpleborder group-hover:border-purple group-hover:scale-105 transition-all shadow-md shadow-purple-600/10">
-          <Image
-            src="/favicon/yuktilogo.png"
-            alt="Yukti Media Logo"
-            width={40}
-            height={40}
-            className="w-full h-full object-contain p-0.5"
-          />
+      <a href="#" className="flex items-center gap-3 no-underline group">
+        <div className="size-8 rounded-lg overflow-hidden flex items-center justify-center bg-[#fac638]/10 border border-[#fac638]/30 group-hover:scale-105 transition-transform">
+          <img src="/favicon/favicon.png" alt="Yukti Media Logo" className="w-full h-full object-contain" />
         </div>
         <h2 className="text-espresso text-lg font-bold tracking-tight group-hover:text-purple transition-colors">
           Yukti Media
